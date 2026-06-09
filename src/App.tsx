@@ -7,11 +7,12 @@ function App() {
             messageType: 'store-site',
             data: { url },
         });
+        console.log(data);
     }
 
     return (
         <>
-        <button></button>
+        <button onClick={() => handleSiteAdd("baleshfc")}></button>
         </>
     )
 }
