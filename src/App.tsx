@@ -3,10 +3,10 @@ import { SendRuntimeEvent } from './util/runtime-messages'
 
 function App() {
     async function handleSiteAdd(url: string) {
-        const result = await SendRuntimeEvent({
+        const { data } = await SendRuntimeEvent<'store-site'>({
             messageType: 'store-site',
             data: { url },
-        })
+        });
     }
 
     return (

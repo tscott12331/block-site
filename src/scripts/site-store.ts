@@ -1,13 +1,13 @@
-import browser from 'webextension-polyfill';
+// import browser from 'webextension-polyfill';
 
-import { AddRuntimeEventListener, type TRuntimeMessageType, type TRuntimeMessage, type IStoreSiteReturn, wrapRuntimeEventReturnData, type IDeleteSiteReturn } from "../util/runtime-messages";
+import { AddRuntimeEventListener, type IStoreSiteReturn, wrapRuntimeEventReturnData, type IDeleteSiteReturn } from "../util/runtime-messages";
 
-AddRuntimeEventListener<TRuntimeMessageType, TRuntimeMessage>(async (message, _sender) => {
+AddRuntimeEventListener(async (message, _sender) => {
     switch(message.messageType) {
         case 'store-site':
-            return wrapRuntimeEventReturnData(await storeSite(message.data.data.url), 'store-site');
+            return wrapRuntimeEventReturnData(await storeSite(message.data.url), 'store-site');
         case "delete-site":
-            return wrapRuntimeEventReturnData(await deleteSite(message.data.data.url), 'delete-site');
+            return wrapRuntimeEventReturnData(await deleteSite(message.data.url), 'delete-site');
     }
 })
 
