@@ -1,25 +1,46 @@
-// import browser from 'webextension-polyfill';
+import browser from 'webextension-polyfill';
 
-import { AddRuntimeEventListener, type IStoreSiteReturn, wrapRuntimeEventReturnData, type IDeleteSiteReturn } from "../util/runtime-messages";
+import { addRuntimeEventListener, type IStoreSiteReturn, type IDeleteSiteReturn, type IGetSitesReturn } from "../util/runtime-messages";
+import type { Site } from '../util/site';
 
-async function storeSite(url: string): Promise<IStoreSiteReturn> {
-    console.log(`storing ${url}`);
-    return { result: true };
-    // return { messageType: 'store-site' as TRuntimeMessageType, data: { result: true }};
+async function getStoredSites(): Promise<Record<string, boolean>> {
+    const res = await browser.storage.local.get("sites");
+
+    return res['sites'] as Record<string, boolean>
 }
 
-async function deleteSite(url: string): Promise<IDeleteSiteReturn> {
-    console.log(`deleting ${url}`);
-    return { result: true };
+async function getSites(): Promise<IGetSitesReturn> {
+    const sites = await getStoredSites();;
+    return { sites: Object.keys(sites) }
+}
+
+async function storeSite(site: Site): Promise<IStoreSiteReturn> {
+    const storedSites = await getStoredSites();
+    storedSites[site] = true;
+
+    await browser.storage.local.set({ sites: storedSites });
+
+    return { result: Object.keys(storedSites) };
+}
+
+async function deleteSite(site: Site): Promise<IDeleteSiteReturn> {
+    const storedSites = await getStoredSites();
+    delete storedSites[site];
+
+    await browser.storage.local.set({ "sites": storedSites });
+
+    return { result: Object.keys(storedSites) };
 }
 
 export function initSiteStore() {
-    AddRuntimeEventListener(async (message, _sender) => {
+    addRuntimeEventListener(async (message, _sender) => {
         switch(message.messageType) {
             case 'store-site':
-                return wrapRuntimeEventReturnData(await storeSite(message.data.url), 'store-site');
-            case "delete-site":
-                return wrapRuntimeEventReturnData(await deleteSite(message.data.url), 'delete-site');
+                return { data: await storeSite(message.data.site), messageType: 'store-site' };
+            case 'delete-site':
+                return { data: await deleteSite(message.data.site), messageType: 'delete-site' };
+            case 'get-sites':
+                return { data: await getSites(), messageType: 'get-sites' };
         }
     })
 }
