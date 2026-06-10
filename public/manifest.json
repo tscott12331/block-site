@@ -13,6 +13,7 @@
         "type": "module"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "tabs"
     ]
 }

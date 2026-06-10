@@ -1,16 +1,10 @@
 import browser from 'webextension-polyfill';
 
 import { addRuntimeEventListener, type IStoreSiteReturn, type IDeleteSiteReturn, type IGetSitesReturn } from "../util/runtime-messages";
-import type { Site } from '../util/site';
-
-async function getStoredSites(): Promise<Record<string, boolean>> {
-    const res = await browser.storage.local.get("sites");
-
-    return res['sites'] as Record<string, boolean>
-}
+import { getStoredSites, type Site } from '../util/site';
 
 async function getSites(): Promise<IGetSitesReturn> {
-    const sites = await getStoredSites();;
+    const sites = await getStoredSites();
     return { sites: Object.keys(sites) }
 }
 
